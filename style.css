@@ -1,0 +1,155 @@
+:root {
+    color-scheme: light dark;
+
+    --fundo: #f4f4f4;
+    --superficie: #ffffff;
+    --texto: #222222;
+    --texto-secundario: #666666;
+    --borda: #cccccc;
+}
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+}
+
+.app {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.cabecalho {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.cabecalho h1 {
+    margin-bottom: 8px;
+}
+
+.cabecalho p {
+    margin-top: 0;
+    color: var(--texto-secundario);
+}
+
+.formulario-container {
+    background: var(--superficie);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.campo label {
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.campo input {
+    padding: 12px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    font-size: 16px;
+    background: var(--superficie);
+    color: var(--texto);
+}
+.botao-adicionar {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.total-container {
+    background: var(--superficie);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.total-container p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    background: var(--superficie);
+}
+
+.total-container strong {
+    font-size: 30px;
+}
+.produto-card {
+    background: var(--superficie);
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.produto-info h3 {
+    margin: 0 0 6px;
+}
+
+.produto-info p {
+    margin: 0;
+    color: var(--texto-secundario);
+}
+
+.produto-acoes {
+    text-align: right;
+}
+
+.produto-acoes strong {
+    display: block;
+    margin-bottom: 8px;
+}
+.produto-acoes button {
+    border: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 4px;
+}
+.botao-editar {
+    background: #eee;
+}
+
+.botao-remover {
+    background: #eee;
+}
+@media (max-width: 400px) {
+    .produto-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .produto-acoes {
+        width: 100%;
+        text-align: left;
+    }
+}
+@media (prefers-color-scheme: dark) {
+
+    :root {
+        --fundo: #121212;
+        --superficie: #1e1e1e;
+        --texto: #f5f5f5;
+        --texto-secundario: #aaaaaa;
+        --borda: #444444;
+    }
+
+}
