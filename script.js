@@ -101,5 +101,45 @@ formulario.addEventListener("submit", function(evento){
 });
 
 botaoPdf.addEventListener("click", function(){
-    console.log("Gerar PDF clicando")
-})
+    const { jsPDF } = window.jspdf;
+
+    const documento = new jsPDF();
+
+    documento.text("Orçamento de Compras", 20,20);
+
+    let posicaoY = 35;
+
+    carrinho.forEach(function(produto){
+
+        documento.setFontSize(12);
+
+        documento.text(
+            produto.nome,
+            20,
+            posicaoY
+        );
+
+        documento.text(
+            produto.quantidade + "x R$" + produto.preco.toFixed(2),
+            20,
+            posicaoY + 7
+        );
+
+        documento.text(
+            "Subtotal: R$" + produto.subtotal.toFixed(2),
+            20,
+            posicaoY + 14
+        );
+
+        posicaoY += 25;
+    });
+
+    documento.setFontSize(14);
+
+    documento.text(
+        "Total: R$" + totalCompra.toFixed(2),
+        20,
+        posicaoY
+    );
+    documento.save("orcamento-compras.pdf");
+});
