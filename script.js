@@ -4,6 +4,7 @@ const precoProduto = document.getElementById("preco-produto");
 const formulario = document.getElementById("nova-compra");
 const listaProdutos = document.getElementById("lista-produtos");
 const mostraTotal = document.getElementById("total-compra");
+const botaoPdf = document.getElementById("gerar-pdf");
 
 let produtoEditando = null;
 let carrinho = [];
@@ -48,8 +49,8 @@ function atualizarCarrinho() {
             <strong> R$ ${produto.subtotal.toFixed(2)}</strong>
 
             <div>
-                <button class="botao-editar" onclick="editarProduto(${produto.id})">Editar</button>
-                <button class="botao-remover" onclick="removerProduto(${produto.id})">Remover</button>
+                <button class="botao-editar" onclick="editarProduto(${produto.id})">Editar ✏️</button>
+                <button class="botao-remover" onclick="removerProduto(${produto.id})">Remover 🗑️</button>
             </div>
         </div>
 
@@ -98,3 +99,7 @@ formulario.addEventListener("submit", function(evento){
     qtdProduto.value = "";
     precoProduto.value = "";
 });
+
+botaoPdf.addEventListener("click", function(){
+    console.log("Gerar PDF clicando")
+})
