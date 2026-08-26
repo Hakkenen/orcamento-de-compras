@@ -105,13 +105,25 @@ botaoPdf.addEventListener("click", function(){
 
     const documento = new jsPDF();
 
+    documento.setFontSize(18);
     documento.text("Orçamento de Compras", 20,20);
+
+    documento.setFontSize(11);
 
     let posicaoY = 35;
 
-    carrinho.forEach(function(produto){
+    documento.text("Produto", 20, posicaoY);
+    documento.text("Qtd", 100, posicaoY);
+    documento.text("Preço", 125, posicaoY);
+    documento.text("Subtotal", 160, posicaoY);
 
-        documento.setFontSize(12);
+    posicaoY += 8;
+
+    documento.line(20, posicaoY, 190, posicaoY);
+
+    posicaoY += 8;
+
+    carrinho.forEach(function(produto){
 
         documento.text(
             produto.nome,
@@ -120,25 +132,37 @@ botaoPdf.addEventListener("click", function(){
         );
 
         documento.text(
-            produto.quantidade + "x R$" + produto.preco.toFixed(2),
-            20,
-            posicaoY + 7
+            String(produto.quantidade),
+            100,
+            posicaoY
         );
 
         documento.text(
-            "Subtotal: R$" + produto.subtotal.toFixed(2),
-            20,
-            posicaoY + 14
+            "R$" + produto.preco.toFixed(2),
+            125,
+            posicaoY
         );
 
-        posicaoY += 25;
+        documento.text(
+            "R$" + produto.subtotal.toFixed(2),
+            160,
+            posicaoY
+        );
+
+        posicaoY += 8;
     });
+
+    posicaoY += 5;
+
+    documento.line(20, posicaoY, 190, posicaoY);
+
+    posicaoY += 10;
 
     documento.setFontSize(14);
 
     documento.text(
         "Total: R$" + totalCompra.toFixed(2),
-        20,
+        140,
         posicaoY
     );
     documento.save("orcamento-compras.pdf");
