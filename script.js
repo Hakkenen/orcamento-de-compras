@@ -5,10 +5,54 @@ const formulario = document.getElementById("nova-compra");
 const listaProdutos = document.getElementById("lista-produtos");
 const mostraTotal = document.getElementById("total-compra");
 const botaoPdf = document.getElementById("gerar-pdf");
+const botaoCesta = document.getElementById("adicionar-cesta");
 
 let produtoEditando = null;
 let carrinho = [];
 let totalCompra = 0;
+
+const cestaBasica = [
+    { nome: "Arroz", quantidade: 2, preco: 6.50 },
+    { nome: "Feijão", quantidade: 2, preco: 8.00 },
+    { nome: "Macarrão", quantidade: 3, preco: 4.50 },
+    { nome: "Açúcar", quantidade: 1, preco: 5.00 },
+    { nome: "Café", quantidade: 2, preco: 12.50 },
+    { nome: "Leite", quantidade: 4, preco: 5.50 },
+    { nome: "Óleo", quantidade: 2, preco: 6.00 },
+    { nome: "Farinha de trigo", quantidade: 1, preco: 5.50 },
+    { nome: "Sal", quantidade: 1, preco: 2.50 },
+    { nome: "Biscoito", quantidade: 3, preco: 4.00 },
+    { nome: "Achocolatado", quantidade: 1, preco: 8.50 },
+    { nome: "Margarina", quantidade: 2, preco: 7.00 },
+    { nome: "Extrato de tomate", quantidade: 3, preco: 3.50 },
+    { nome: "Milho", quantidade: 2, preco: 4.50 },
+    { nome: "Ervilha", quantidade: 2, preco: 4.00 },
+    { nome: "Sardinha", quantidade: 2, preco: 7.50 },
+    { nome: "Ovos", quantidade: 2, preco: 12.00 },
+    { nome: "Pão", quantidade: 2, preco: 8.00 },
+    { nome: "Queijo", quantidade: 1, preco: 18.00 },
+    { nome: "Presunto", quantidade: 1, preco: 15.00 },
+    { nome: "Frango", quantidade: 2, preco: 14.00 },
+    { nome: "Carne moída", quantidade: 1, preco: 25.00 },
+    { nome: "Linguiça", quantidade: 1, preco: 18.00 },
+    { nome: "Batata", quantidade: 3, preco: 5.00 },
+    { nome: "Cebola", quantidade: 2, preco: 4.00 },
+    { nome: "Tomate", quantidade: 3, preco: 6.00 },
+    { nome: "Alface", quantidade: 2, preco: 3.50 },
+    { nome: "Banana", quantidade: 2, preco: 6.00 },
+    { nome: "Maçã", quantidade: 2, preco: 8.00 },
+    { nome: "Laranja", quantidade: 3, preco: 5.00 },
+    { nome: "Sabonete", quantidade: 4, preco: 2.50 },
+    { nome: "Shampoo", quantidade: 1, preco: 15.00 },
+    { nome: "Creme dental", quantidade: 2, preco: 6.00 },
+    { nome: "Papel higiênico", quantidade: 1, preco: 18.00 },
+    { nome: "Detergente", quantidade: 3, preco: 2.50 },
+    { nome: "Sabão em pó", quantidade: 1, preco: 12.00 },
+    { nome: "Água sanitária", quantidade: 2, preco: 5.00 },
+    { nome: "Esponja", quantidade: 3, preco: 2.00 },
+    { nome: "Papel toalha", quantidade: 1, preco: 7.00 },
+    { nome: "Sacos para lixo", quantidade: 1, preco: 10.00 }
+];
 
 function editarProduto(id){
     const produto = carrinho.find(function(produto){
@@ -63,6 +107,18 @@ function atualizarCarrinho() {
     mostraTotal.textContent = totalCompra.toFixed(2);
 }
 
+function adicionarCabecalhoPDF(documento) {
+
+    documento.setFontSize(11);
+
+    documento.text("Produto", 20, 35);
+    documento.text("Qtd.", 100, 35);
+    documento.text("Preço", 125, 35);
+    documento.text("Subtotal", 160, 35);
+
+    documento.line(20, 40, 190, 40);
+}
+
 formulario.addEventListener("submit", function(evento){
     evento.preventDefault();
     
@@ -100,30 +156,43 @@ formulario.addEventListener("submit", function(evento){
     precoProduto.value = "";
 });
 
-botaoPdf.addEventListener("click", function(){
+botaoPdf.addEventListener("click", function() {
+
     const { jsPDF } = window.jspdf;
 
     const documento = new jsPDF();
 
-    documento.setFontSize(18);
-    documento.text("Orçamento de Compras", 20,20);
+    function adicionarCabecalhoPDF() {
 
-    documento.setFontSize(11);
+        documento.setFontSize(18);
+        documento.text("Orçamento de Compras", 20, 20);
 
-    let posicaoY = 35;
+        documento.setFontSize(11);
 
-    documento.text("Produto", 20, posicaoY);
-    documento.text("Qtd", 100, posicaoY);
-    documento.text("Preço", 125, posicaoY);
-    documento.text("Subtotal", 160, posicaoY);
+        documento.text("Produto", 20, 35);
+        documento.text("Qtd.", 100, 35);
+        documento.text("Preço", 125, 35);
+        documento.text("Subtotal", 160, 35);
 
-    posicaoY += 8;
+        documento.line(20, 40, 190, 40);
+    }
 
-    documento.line(20, posicaoY, 190, posicaoY);
+    adicionarCabecalhoPDF();
 
-    posicaoY += 8;
+    let posicaoY = 50;
 
-    carrinho.forEach(function(produto){
+    carrinho.forEach(function(produto) {
+
+        if (posicaoY > 270) {
+
+            documento.addPage();
+
+            adicionarCabecalhoPDF();
+
+            posicaoY = 50;
+        }
+
+        documento.setFontSize(11);
 
         documento.text(
             produto.nome,
@@ -161,9 +230,38 @@ botaoPdf.addEventListener("click", function(){
     documento.setFontSize(14);
 
     documento.text(
-        "Total: R$" + totalCompra.toFixed(2),
+        "TOTAL: R$" + totalCompra.toFixed(2),
         140,
         posicaoY
     );
+
     documento.save("orcamento-compras.pdf");
+});
+
+botaoCesta.addEventListener("click", function() {
+
+    const confirmar = confirm(
+        "Adicionar uma lista-base de cesta básica?\n\n" +
+        "Os preços apresentados são apenas estimativas " +
+        "e devem ser ajustados de acordo com os preços do mercado."
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    cestaBasica.forEach(function(item) {
+
+        const produto = {
+            id: Date.now() + Math.random(),
+            nome: item.nome,
+            quantidade: item.quantidade,
+            preco: item.preco,
+            subtotal: item.quantidade * item.preco
+        };
+
+        carrinho.push(produto);
+    });
+
+    atualizarCarrinho();
 });
