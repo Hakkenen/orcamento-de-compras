@@ -7,6 +7,16 @@
     --texto-secundario: #666666;
     --borda: #cccccc;
 
+    /* Primária (Ação Principal - Ex: Adicionar produto) */
+    --cor-primaria: #2e7d32;
+    --cor-primaria-hover: #1b5e20;
+
+    /* Secundária (Ação de Suporte - Ex: Cesta Básica) */
+    --cor-secundaria: #fef3c7;
+    --cor-secundaria-texto: #92400e;
+    --cor-secundaria-borda: #fcd34d;
+    --cor-secundaria-hover: #fde68a;
+
     --botao-editar: #e8f0fe;
     --botao-remover: #fde8e8;
 }
@@ -66,14 +76,72 @@ body {
     background: var(--superficie);
     color: var(--texto);
 }
+/* Botão Principal (+ Adicionar produto) */
 .botao-adicionar {
     width: 100%;
-    padding: 13px;
+    padding: 14px;
+    background-color: var(--cor-primaria);
+    color: #ffffff;
     border: none;
     border-radius: 8px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-bottom: 10px;
+}
+
+.botao-adicionar:hover {
+    background-color: var(--cor-primaria-hover);
+}
+
+.botao-adicionar:active {
+    transform: scale(0.98);
+}
+
+/* Botão Secundário (#adicionar-cesta) */
+#adicionar-cesta {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--cor-secundaria);
+    color: var(--cor-secundaria-texto);
+    border: 1px solid var(--cor-secundaria-borda);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+#adicionar-cesta:hover {
+    background-color: var(--cor-secundaria-hover);
+    transform: translateY(-1px);
+}
+
+#adicionar-cesta:active {
+    transform: translateY(0);
+}
+
+/* Botão Gerar PDF (#gerar-pdf) */
+#gerar-pdf {
+    background-color: transparent;
+    color: var(--texto);
+    border: 1px solid var(--borda);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background-color 0.2s ease;
+}
+
+#gerar-pdf:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 .total-container {
     background: var(--superficie);
@@ -149,8 +217,30 @@ body {
         text-align: left;
     }
 }
-@media (prefers-color-scheme: dark) {
 
+.acoes-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Em telas maiores, coloca os botões lado a lado */
+@media (min-width: 480px) {
+    .acoes-formulario {
+        flex-direction: row;
+    }
+    
+    .botao-adicionar {
+        margin-bottom: 0;
+        flex: 1.2;
+    }
+
+    #adicionar-cesta {
+        flex: 1;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
     :root {
         --fundo: #121212;
         --superficie: #1e1e1e;
@@ -158,8 +248,15 @@ body {
         --texto-secundario: #aaaaaa;
         --borda: #444444;
 
+        --cor-primaria: #4caf50;
+        --cor-primaria-hover: #388e3c;
+
+        --cor-secundaria: #3a2e10;
+        --cor-secundaria-texto: #fef3c7;
+        --cor-secundaria-borda: #78350f;
+        --cor-secundaria-hover: #523e13;
+
         --botao-editar: #263a5c;
         --botao-remover: #5a2929;
     }
-
 }
