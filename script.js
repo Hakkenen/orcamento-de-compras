@@ -6,52 +6,53 @@ const listaProdutos = document.getElementById("lista-produtos");
 const mostraTotal = document.getElementById("total-compra");
 const botaoPdf = document.getElementById("gerar-pdf");
 const botaoCesta = document.getElementById("adicionar-cesta");
+const botaoPrincipal = document.getElementById("botao-principal");
 
 let produtoEditando = null;
 let carrinho = [];
 let totalCompra = 0;
 
 const cestaBasica = [
-    { nome: "Arroz", quantidade: 2, preco: 6.50 },
-    { nome: "Feijão", quantidade: 2, preco: 8.00 },
-    { nome: "Macarrão", quantidade: 3, preco: 4.50 },
-    { nome: "Açúcar", quantidade: 1, preco: 5.00 },
-    { nome: "Café", quantidade: 2, preco: 12.50 },
-    { nome: "Leite", quantidade: 4, preco: 5.50 },
-    { nome: "Óleo", quantidade: 2, preco: 6.00 },
-    { nome: "Farinha de trigo", quantidade: 1, preco: 5.50 },
-    { nome: "Sal", quantidade: 1, preco: 2.50 },
-    { nome: "Biscoito", quantidade: 3, preco: 4.00 },
-    { nome: "Achocolatado", quantidade: 1, preco: 8.50 },
-    { nome: "Margarina", quantidade: 2, preco: 7.00 },
-    { nome: "Extrato de tomate", quantidade: 3, preco: 3.50 },
-    { nome: "Milho", quantidade: 2, preco: 4.50 },
-    { nome: "Ervilha", quantidade: 2, preco: 4.00 },
-    { nome: "Sardinha", quantidade: 2, preco: 7.50 },
-    { nome: "Ovos", quantidade: 2, preco: 12.00 },
-    { nome: "Pão", quantidade: 2, preco: 8.00 },
-    { nome: "Queijo", quantidade: 1, preco: 18.00 },
-    { nome: "Presunto", quantidade: 1, preco: 15.00 },
-    { nome: "Frango", quantidade: 2, preco: 14.00 },
-    { nome: "Carne moída", quantidade: 1, preco: 25.00 },
-    { nome: "Linguiça", quantidade: 1, preco: 18.00 },
-    { nome: "Batata", quantidade: 3, preco: 5.00 },
-    { nome: "Cebola", quantidade: 2, preco: 4.00 },
-    { nome: "Tomate", quantidade: 3, preco: 6.00 },
-    { nome: "Alface", quantidade: 2, preco: 3.50 },
-    { nome: "Banana", quantidade: 2, preco: 6.00 },
-    { nome: "Maçã", quantidade: 2, preco: 8.00 },
-    { nome: "Laranja", quantidade: 3, preco: 5.00 },
-    { nome: "Sabonete", quantidade: 4, preco: 2.50 },
-    { nome: "Shampoo", quantidade: 1, preco: 15.00 },
-    { nome: "Creme dental", quantidade: 2, preco: 6.00 },
-    { nome: "Papel higiênico", quantidade: 1, preco: 18.00 },
-    { nome: "Detergente", quantidade: 3, preco: 2.50 },
-    { nome: "Sabão em pó", quantidade: 1, preco: 12.00 },
-    { nome: "Água sanitária", quantidade: 2, preco: 5.00 },
-    { nome: "Esponja", quantidade: 3, preco: 2.00 },
-    { nome: "Papel toalha", quantidade: 1, preco: 7.00 },
-    { nome: "Sacos para lixo", quantidade: 1, preco: 10.00 }
+    { nome: "Arroz", quantidade: 0, preco: 0.00 },
+    { nome: "Feijão", quantidade: 0, preco: 0.00 },
+    { nome: "Macarrão", quantidade: 0, preco: 0.00 },
+    { nome: "Açúcar", quantidade: 0, preco: 0.00 },
+    { nome: "Café", quantidade: 0, preco: 0.00 },
+    { nome: "Leite", quantidade: 0, preco: 0.00 },
+    { nome: "Óleo", quantidade: 0, preco: 0.00 },
+    { nome: "Farinha de trigo", quantidade: 0, preco: 0.00 },
+    { nome: "Sal", quantidade: 0, preco: 0.00 },
+    { nome: "Biscoito", quantidade: 0, preco: 0.00 },
+    { nome: "Achocolatado", quantidade: 0, preco: 0.00 },
+    { nome: "Margarina", quantidade: 0, preco: 0.00 },
+    { nome: "Extrato de tomate", quantidade: 0, preco: 0.00 },
+    { nome: "Milho", quantidade: 0, preco: 0.00 },
+    { nome: "Ervilha", quantidade: 0, preco: 0.00 },
+    { nome: "Sardinha", quantidade: 0, preco: 0.00 },
+    { nome: "Ovos", quantidade: 0, preco: 0.00 },
+    { nome: "Pão", quantidade: 0, preco: 0.00 },
+    { nome: "Queijo", quantidade: 0, preco: 0.00 },
+    { nome: "Presunto", quantidade: 0, preco: 0.00 },
+    { nome: "Frango", quantidade: 0, preco: 0.00 },
+    { nome: "Carne moída", quantidade: 0, preco: 0.00 },
+    { nome: "Linguiça", quantidade: 0, preco: 0.00 },
+    { nome: "Batata", quantidade: 0, preco: 0.00 },
+    { nome: "Cebola", quantidade: 0, preco: 0.00 },
+    { nome: "Tomate", quantidade: 0, preco: 0.00 },
+    { nome: "Alface", quantidade: 0, preco: 0.00 },
+    { nome: "Banana", quantidade: 0, preco: 0.00 },
+    { nome: "Maçã", quantidade: 0, preco: 0.00 },
+    { nome: "Laranja", quantidade: 0, preco: 0.00 },
+    { nome: "Sabonete", quantidade: 0, preco: 0.00 },
+    { nome: "Shampoo", quantidade: 0, preco: 0.00 },
+    { nome: "Creme dental", quantidade: 0, preco: 0.00 },
+    { nome: "Papel higiênico", quantidade: 0, preco: 0.00 },
+    { nome: "Detergente", quantidade: 0, preco: 0.00 },
+    { nome: "Sabão em pó", quantidade: 0, preco: 0.00 },
+    { nome: "Água sanitária", quantidade: 0, preco: 0.00 },
+    { nome: "Esponja", quantidade: 0, preco: 0.00 },
+    { nome: "Papel toalha", quantidade: 0, preco: 0.00 },
+    { nome: "Sacos para lixo", quantidade: 0, preco: 0.00 }
 ];
 
 function editarProduto(id){
@@ -64,6 +65,8 @@ function editarProduto(id){
     precoProduto.value = produto.preco;
 
     produtoEditando = id;
+    
+    botaoPrincipal.textContent = "✏️ Editar Produto";
 }
 
 function removerProduto(id) {
@@ -136,7 +139,8 @@ formulario.addEventListener("submit", function(evento){
 
     if (produtoEditando === null) {
         carrinho.push(produto);
-    } else {
+    } 
+    else {
         // edição
         const indice = carrinho.findIndex(function(produto){
             return produto.id === produtoEditando;
@@ -146,6 +150,8 @@ formulario.addEventListener("submit", function(evento){
 
         carrinho[indice] = produto;
 
+        botaoPrincipal.textContent = "+ Adicionar Produto";
+    
         produtoEditando = null;
     }
 
