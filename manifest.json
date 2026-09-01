@@ -1,0 +1,17 @@
+{
+    "name": "Orçamento de Compras",
+    "short_name": "Orçamento",
+    "description": "Aplicativo para acompanhar o orçamento das compras no mercado.",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "lang": "pt-BR",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/1170/1170576.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

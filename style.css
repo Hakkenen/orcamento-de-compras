@@ -323,3 +323,26 @@ body {
         grid-column: span 2;
     }
 }
+/* ==========================================================================
+   RODAPÉ (FOOTER) & LINKS
+   ========================================================================== */
+footer {
+    text-align: center;
+    padding: 20px 0 10px;
+    margin-top: 30px;
+    font-size: 14px;
+    color: var(--texto-secundario);
+    border-top: 1px solid var(--borda);
+}
+
+footer a {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--cor-primaria-hover);
+    text-decoration: underline;
+}
