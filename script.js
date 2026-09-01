@@ -7,10 +7,18 @@ const mostraTotal = document.getElementById("total-compra");
 const botaoPdf = document.getElementById("gerar-pdf");
 const botaoCesta = document.getElementById("adicionar-cesta");
 const botaoPrincipal = document.getElementById("botao-principal");
+const botaoLimpar = document.getElementById("limpar-carrinho");
 
 let produtoEditando = null;
 let carrinho = [];
 let totalCompra = 0;
+
+const carrinhoSalvo = localStorage.getItem("carrinho");
+
+if (carrinhoSalvo) {
+    carrinho = JSON.parse(carrinhoSalvo);
+    atualizarCarrinho();
+}
 
 const cestaBasica = [
     { nome: "Arroz", quantidade: 0, preco: 0.00 },
@@ -108,6 +116,9 @@ function atualizarCarrinho() {
     });
 
     mostraTotal.textContent = totalCompra.toFixed(2);
+
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+
 }
 
 function adicionarCabecalhoPDF(documento) {
@@ -128,6 +139,15 @@ formulario.addEventListener("submit", function(evento){
     const qtd_Produto = Number(qtdProduto.value);
     const preco_Produto = Number(precoProduto.value);
     const subtotal = qtd_Produto * preco_Produto;
+
+    if (
+        nomeProduto.value.trim() === "" ||
+        qtdProduto <= 0 ||
+        preco_Produto <= 0
+    ) {
+        alert("Preencha o produto, a quantidade e o preço corretamente.");
+        return;
+    }
 
     const produto = {
         id: Date.now(),
@@ -270,4 +290,26 @@ botaoCesta.addEventListener("click", function() {
     });
 
     atualizarCarrinho();
+});
+
+botaoLimpar.addEventListener("click", function() {
+
+    const confirmar = confirm(
+        "Tem certeza que deseja limpar todo o carrinho?"
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    carrinho = [];
+    produtoEditando = null;
+
+    atualizarCarrinho();
+
+    nomeProduto.value = "";
+    qtdProduto.value = "";
+    precoProduto.value = "";
+
+    botaoPrincipal.textContent = "+ Adicionar produto";
 });
