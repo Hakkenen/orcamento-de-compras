@@ -1,3 +1,15 @@
+// ==========================================================================
+// SERVICE WORKER (Suporte Offline / PWA)
+// ==========================================================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+}
+
+// ==========================================================================
+// SELETORES DOM
+// ==========================================================================
 const nomeProduto = document.getElementById("nome-produto");
 const qtdProduto = document.getElementById("qtd-produto");
 const precoProduto = document.getElementById("preco-produto");
@@ -6,23 +18,46 @@ const listaProdutos = document.getElementById("lista-produtos");
 const mostraTotal = document.getElementById("total-compra");
 const botaoPdf = document.getElementById("gerar-pdf");
 const botaoCesta = document.getElementById("adicionar-cesta");
-const botaoPrincipal = document.getElementById("botao-principal");
 const botaoLimpar = document.getElementById("limpar-carrinho");
 const mostrarAno = document.getElementById("ano");
-const agora = new Date();
 
+// Seletores do Modal de Edição
+const modalEdicao = document.getElementById("modal-edicao");
+const formEdicao = document.getElementById("form-edicao");
+const editNomeProduto = document.getElementById("edit-nome-produto");
+const editQtdProduto = document.getElementById("edit-qtd-produto");
+const editPrecoProduto = document.getElementById("edit-preco-produto");
+const fecharModal = document.getElementById("fechar-modal");
+
+// Estilo Dinâmico para Travar a Rolagem quando o Modal abrir
+const estiloModal = document.createElement("style");
+estiloModal.innerHTML = `body.modal-aberto { overflow: hidden; }`;
+document.head.appendChild(estiloModal);
+
+// ==========================================================================
+// ESTADO DA APLICAÇÃO
+// ==========================================================================
 let produtoEditando = null;
 let carrinho = [];
 let totalCompra = 0;
 
-// Carregar dados salvos
-const carrinhoSalvo = localStorage.getItem("carrinho");
-if (carrinhoSalvo) {
-    carrinho = JSON.parse(carrinhoSalvo);
-    atualizarCarrinho();
+// Atualiza o ano no rodapé
+if (mostrarAno) {
+    mostrarAno.textContent = new Date().getFullYear();
 }
 
-// Cesta básica ajustada com quantidade padrão 1
+// Recupera carrinho do localStorage
+const carrinhoSalvo = localStorage.getItem("carrinho");
+if (carrinhoSalvo) {
+    try {
+        carrinho = JSON.parse(carrinhoSalvo);
+        atualizarCarrinho();
+    } catch (e) {
+        carrinho = [];
+    }
+}
+
+// Lista Padrão de Cesta Básica (40 itens)
 const cestaBasica = [
     { nome: "Arroz", quantidade: 1, preco: 0.00 },
     { nome: "Feijão", quantidade: 1, preco: 0.00 },
@@ -66,19 +101,9 @@ const cestaBasica = [
     { nome: "Sacos para lixo", quantidade: 1, preco: 0.00 }
 ];
 
-function editarProduto(id) {
-    const produto = carrinho.find(p => p.id === id);
-    if (!produto) return;
-
-    nomeProduto.value = produto.nome;
-    qtdProduto.value = produto.quantidade;
-    precoProduto.value = produto.preco;
-
-    produtoEditando = id;
-    botaoPrincipal.textContent = "✏️ Editar Produto";
-    nomeProduto.focus();
-}
-
+// ==========================================================================
+// FUNÇÕES DE GERENCIAMENTO DO CARRINHO
+// ==========================================================================
 function removerProduto(id) {
     carrinho = carrinho.filter(p => p.id !== id);
     atualizarCarrinho();
@@ -111,7 +136,9 @@ function atualizarCarrinho() {
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
-// Evento de envio do formulário
+// ==========================================================================
+// FORMULÁRIO PRINCIPAL (Adicionar Produto)
+// ==========================================================================
 formulario.addEventListener("submit", function(evento) {
     evento.preventDefault();
     
@@ -119,7 +146,6 @@ formulario.addEventListener("submit", function(evento) {
     const preco_Produto = Number(precoProduto.value);
     const subtotal = qtd_Produto * preco_Produto;
 
-    // CORREÇÃO: Utilizando qtd_Produto em vez de qtdProduto na verificação
     if (
         nomeProduto.value.trim() === "" ||
         isNaN(qtd_Produto) || qtd_Produto <= 0 ||
@@ -129,30 +155,15 @@ formulario.addEventListener("submit", function(evento) {
         return;
     }
 
-    if (produtoEditando === null) {
-        const produto = {
-            id: Date.now(),
-            nome: nomeProduto.value.trim(),
-            quantidade: qtd_Produto,
-            preco: preco_Produto,
-            subtotal: subtotal
-        };
-        carrinho.push(produto);
-    } else {
-        const indice = carrinho.findIndex(p => p.id === produtoEditando);
-        if (indice !== -1) {
-            carrinho[indice] = {
-                id: produtoEditando,
-                nome: nomeProduto.value.trim(),
-                quantidade: qtd_Produto,
-                preco: preco_Produto,
-                subtotal: subtotal
-            };
-        }
-        botaoPrincipal.textContent = "+ Adicionar produto";
-        produtoEditando = null;
-    }
+    const produto = {
+        id: Date.now() + Math.random(),
+        nome: nomeProduto.value.trim(),
+        quantidade: qtd_Produto,
+        preco: preco_Produto,
+        subtotal: subtotal
+    };
 
+    carrinho.push(produto);
     atualizarCarrinho();
 
     nomeProduto.value = "";
@@ -161,7 +172,115 @@ formulario.addEventListener("submit", function(evento) {
     nomeProduto.focus();
 });
 
-// Geração de PDF com Numeração de Páginas (Página X de Y)
+// ==========================================================================
+// LÓGICA DO MODAL DE EDIÇÃO
+// ==========================================================================
+function editarProduto(id) {
+    const produto = carrinho.find(p => p.id === id);
+    if (!produto) return;
+
+    editNomeProduto.value = produto.nome;
+    editQtdProduto.value = produto.quantidade;
+    editPrecoProduto.value = produto.preco;
+
+    produtoEditando = id;
+    modalEdicao.classList.add("ativo");
+    document.body.classList.add("modal-aberto");
+    
+    // Seleciona o conteúdo da quantidade para alteração rápida
+    setTimeout(() => {
+        editQtdProduto.focus();
+        editQtdProduto.select();
+    }, 50);
+}
+
+function fecharModalEdicao() {
+    modalEdicao.classList.remove("ativo");
+    document.body.classList.remove("modal-aberto");
+    produtoEditando = null;
+}
+
+formEdicao.addEventListener("submit", function(evento) {
+    evento.preventDefault();
+
+    const qtd = Number(editQtdProduto.value);
+    const preco = Number(editPrecoProduto.value);
+
+    if (
+        editNomeProduto.value.trim() === "" ||
+        isNaN(qtd) || qtd <= 0 ||
+        isNaN(preco) || preco < 0
+    ) {
+        alert("Preencha todos os campos corretamente.");
+        return;
+    }
+
+    const indice = carrinho.findIndex(p => p.id === produtoEditando);
+    if (indice !== -1) {
+        carrinho[indice] = {
+            id: produtoEditando,
+            nome: editNomeProduto.value.trim(),
+            quantidade: qtd,
+            preco: preco,
+            subtotal: qtd * preco
+        };
+    }
+
+    fecharModalEdicao();
+    atualizarCarrinho();
+});
+
+fecharModal.addEventListener("click", fecharModalEdicao);
+
+modalEdicao.addEventListener("click", (e) => {
+    if (e.target === modalEdicao) {
+        fecharModalEdicao();
+    }
+});
+
+// ==========================================================================
+// BOTÕES DE AÇÃO
+// ==========================================================================
+
+// Inserir Cesta Básica
+botaoCesta.addEventListener("click", function() {
+    const confirmar = confirm(
+        "Adicionar a lista completa de cesta básica (40 itens)?\n\n" +
+        "Ajuste os preços dos itens conforme for fazendo as compras."
+    );
+
+    if (!confirmar) return;
+
+    cestaBasica.forEach(function(item, index) {
+        carrinho.push({
+            id: Date.now() + index + Math.random(),
+            nome: item.nome,
+            quantidade: item.quantidade,
+            preco: item.preco,
+            subtotal: item.quantidade * item.preco
+        });
+    });
+
+    atualizarCarrinho();
+});
+
+// Limpar Carrinho
+botaoLimpar.addEventListener("click", function() {
+    if (carrinho.length === 0) return;
+
+    const confirmar = confirm("Tem certeza que deseja limpar todo o carrinho?");
+    if (!confirmar) return;
+
+    carrinho = [];
+    produtoEditando = null;
+    atualizarCarrinho();
+
+    nomeProduto.value = "";
+    qtdProduto.value = "";
+    precoProduto.value = "";
+});
+
+// Gerar PDF Paginado
 botaoPdf.addEventListener("click", function() {
     if (carrinho.length === 0) {
         alert("Adicione produtos ao carrinho antes de gerar o PDF.");
@@ -189,7 +308,6 @@ botaoPdf.addEventListener("click", function() {
     desenharCabecalho();
     let posicaoY = 50;
 
-    // 1. Renderiza os itens e cria novas páginas se necessário
     carrinho.forEach(function(produto) {
         if (posicaoY > 260) {
             documento.addPage();
@@ -215,81 +333,84 @@ botaoPdf.addEventListener("click", function() {
     documento.setFontSize(14);
     documento.text("TOTAL: R$ " + totalCompra.toFixed(2), 130, posicaoY);
 
-    // 2. Adiciona a numeração "Página X de Y" no rodapé de todas as páginas
     const totalPaginas = documento.internal.getNumberOfPages();
 
     for (let i = 1; i <= totalPaginas; i++) {
         documento.setPage(i);
         documento.setFont("helvetica", "normal");
         documento.setFontSize(9);
-        documento.setTextColor(120, 120, 120); // Cor cinza suave para o rodapé
+        documento.setTextColor(120, 120, 120);
 
-        // Linha divisória do rodapé
         documento.line(20, 280, 190, 280);
-
-        // Texto do rodapé alinhado à direita
-        const textoRodape = `Página ${i} de ${totalPaginas}`;
-        documento.text(textoRodape, 190, 286, { align: "right" });
-
-        // Identificação opcional à esquerda
-        documento.text("Orçamento de Compras - José Hakkenen - Web Developper", 20, 286);
+        documento.text(`Página ${i} de ${totalPaginas}`, 190, 286, { align: "right" });
+        documento.text("Orçamento de Compras - Mercado", 20, 286);
     }
 
     documento.save("orcamento-compras.pdf");
 });
+// ==========================================================================
+// LEITURA DE CÓDIGO DE BARRAS E BUSCA NA API
+// ==========================================================================
+const btnEscanear = document.getElementById("btn-escanear");
+const modalScanner = document.getElementById("modal-scanner");
+const fecharScanner = document.getElementById("fechar-scanner");
+const statusScanner = document.getElementById("status-scanner");
 
-// Adicionar Cesta Básica
-botaoCesta.addEventListener("click", function() {
-    const confirmar = confirm(
-        "Adicionar uma lista-base de cesta básica?\n\n" +
-        "Ajuste a quantidade e o preço dos itens conforme o mercado."
-    );
+let html5QrCode = null;
 
-    if (!confirmar) return;
+// Abre a câmera e inicia o leitor
+btnEscanear.addEventListener("click", () => {
+    modalScanner.classList.add("ativo");
+    statusScanner.textContent = "Acessando câmera...";
 
-    cestaBasica.forEach(function(item) {
-        carrinho.push({
-            id: Date.now() + Math.random(),
-            nome: item.nome,
-            quantidade: item.quantidade,
-            preco: item.preco,
-            subtotal: item.quantidade * item.preco
-        });
+    html5QrCode = new Html5Qrcode("leitor-camera");
+
+    const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+    html5QrCode.start(
+        { facingMode: "environment" }, // Usa a câmera traseira
+        config,
+        aoDetectarCodigo
+    ).catch(err => {
+        statusScanner.textContent = "Erro ao acessar a câmera. Verifique as permissões.";
     });
-
-    atualizarCarrinho();
 });
 
-// Limpar Carrinho
-botaoLimpar.addEventListener("click", function() {
-    if (carrinho.length === 0) return;
+// Callback ao ler o código com sucesso
+function aoDetectarCodigo(decodedText) {
+    statusScanner.textContent = `Código lido: ${decodedText}. Buscando produto...`;
+    
+    // Para a câmera
+    pararScanner();
 
-    const confirmar = confirm("Tem certeza que deseja limpar todo o carrinho?");
-    if (!confirmar) return;
-
-    carrinho = [];
-    produtoEditando = null;
-    atualizarCarrinho();
-
-    nomeProduto.value = "";
-    qtdProduto.value = "";
-    precoProduto.value = "";
-    botaoPrincipal.textContent = "+ Adicionar produto";
-});
-
-// Registra o Service Worker para suporte Offline e PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then((registration) => {
-        console.log('Service Worker registrado com sucesso:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('Falha ao registrar o Service Worker:', error);
-      });
-  });
+    // Consulta API pública Open Food Facts (Brasil)
+    fetch(`https://br.openfoodfacts.org/api/v0/product/${decodedText}.json`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 1 && data.product.product_name) {
+                nomeProduto.value = data.product.product_name;
+            } else {
+                alert(`Código ${decodedText} lido! Produto não encontrado na base de dados pública. Digite o nome manualmente.`);
+            }
+        })
+        .catch(() => {
+            alert(`Código ${decodedText} lido! Não foi possível buscar o nome online (sem conexão).`);
+        })
+        .finally(() => {
+            modalScanner.classList.remove("ativo");
+            qtdProduto.focus();
+        });
 }
 
-// mostra o ano no footer
+function pararScanner() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+        }).catch(() => {});
+    }
+}
 
-mostrarAno.textContent = agora.getFullYear();
+fecharScanner.addEventListener("click", () => {
+    pararScanner();
+    modalScanner.classList.remove("ativo");
+});

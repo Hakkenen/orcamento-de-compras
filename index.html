@@ -3,87 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orçamento de Compras</title>
+    <title>Lista de Compras</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2e7d32">
+
+    <!-- Biblioteca jsPDF para exportação de relatórios -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Biblioteca HTML5 QR Code para Leitura de Código de Barras -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
 
-    <main class="app">
-
-        <header class="cabecalho">
-            <h1>🛒 Orçamento de Compras</h1>
-            <p>Acompanhe suas compras enquanto estiver no mercado.</p>
+    <main class="container">
+        <header>
+            <h1>🛒 Minha Lista de Compras</h1>
         </header>
 
-        <section class="formulario-container">
-
+        <!-- Formulário de Adição de Produto -->
+        <section class="card">
+            <h2>➕ Adicionar Produto</h2>
             <form id="nova-compra">
-
                 <div class="campo">
                     <label for="nome-produto">Produto</label>
-                    <input type="text" id="nome-produto">
+                    <div class="input-com-botao">
+                        <input type="text" id="nome-produto" placeholder="Ex: Arroz" required>
+                        <button type="button" id="btn-escanear" class="botao-camera" title="Escanear Código de Barras">
+                            📷
+                        </button>
+                    </div>
                 </div>
 
-                <div class="campo">
-                    <label for="qtd-produto">Quantidade</label>
-                    <input type="number" id="qtd-produto">
+                <div class="campo-duplo">
+                    <div class="campo">
+                        <label for="qtd-produto">Qtd.</label>
+                        <input type="number" id="qtd-produto" placeholder="1" min="1" value="1" required>
+                    </div>
+                    <div class="campo">
+                        <label for="preco-produto">Preço (R$)</label>
+                        <input type="number" id="preco-produto" step="0.01" placeholder="0,00" min="0" required>
+                    </div>
                 </div>
 
-                <div class="campo">
-                    <label for="preco-produto">Preço</label>
-                    <input type="number" id="preco-produto" step="0.01">
-                </div>
-
-                <div id="acoes-formulario">
-                    <button type="submit" class="botao-adicionar" id="botao-principal">
-                        + Adicionar produto
-                    </button>
-
-                    <button type="button" id="adicionar-cesta">
-                        🛒 Adicionar cesta básica
-                    </button>
-
-                    <button type="button" id="limpar-carrinho">
-                        🗑️ Limpar Carrinho
-                    </button>
-
-                    <button type="button" id="gerar-pdf">
-                       📄 Gerar PDF                         
-                    </button>
-                </div>
-
+                <button type="submit" id="botao-principal" class="botao-adicionar">+ Adicionar Produto</button>
             </form>
-
         </section>
 
-
-        <section class="total-container">
-
-            <p>Total da compra</p>
-
-            <strong>
-                R$ <span id="total-compra">0.00</span>
-            </strong>
-            
+        <!-- Ações do Carrinho -->
+        <section class="acoes-container">
+            <button id="adicionar-cesta" class="botao-secundario">📦 Cesta Básica (40 itens)</button>
+            <button id="limpar-carrinho" class="botao-danger">🗑️ Limpar Carrinho</button>
         </section>
 
-        <section class="itens-container">
+        <!-- Lista de Produtos e Total -->
+        <section class="card itens-container">
+            <div class="cabecalho-lista">
+                <h2>Itens no Carrinho</h2>
+                <div class="total-box">
+                    <span>Total: R$ <strong id="total-compra">0.00</strong></span>
+                </div>
+            </div>
 
-            <h2>Itens da compra</h2>
+            <div id="lista-produtos">
+                <!-- Itens renderizados via JavaScript -->
+            </div>
 
-            <div id="lista-produtos"></div>
-
+            <button id="gerar-pdf" class="botao-pdf">📄 Gerar PDF do Orçamento</button>
         </section>
 
+        <!-- Modal do Leitor de Código de Barras -->
+        <div id="modal-scanner" class="modal-overlay">
+            <div class="modal-conteudo">
+                <h2>📷 Ler Código de Barras</h2>
+                <div id="leitor-camera"></div>
+                <p id="status-scanner">Aponte a câmera para o código de barras...</p>
+                <button type="button" id="fechar-scanner" class="botao-remover">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- Modal de Edição de Produto -->
+        <div id="modal-edicao" class="modal-overlay">
+            <div class="modal-conteudo">
+                <h2>✏️ Editar Produto</h2>
+                <form id="form-edicao">
+                    <div class="campo">
+                        <label for="edit-nome-produto">Produto</label>
+                        <input type="text" id="edit-nome-produto" required>
+                    </div>
+                    <div class="campo">
+                        <label for="edit-qtd-produto">Quantidade</label>
+                        <input type="number" id="edit-qtd-produto" min="1" required>
+                    </div>
+                    <div class="campo">
+                        <label for="edit-preco-produto">Preço (R$)</label>
+                        <input type="number" id="edit-preco-produto" step="0.01" min="0" required>
+                    </div>
+                    <div class="modal-acoes">
+                        <button type="submit" class="botao-adicionar">Salvar Alterações</button>
+                        <button type="button" id="fechar-modal" class="botao-remover">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Rodapé -->
+        <footer>
+            © <span id="ano"></span> Desenvolvido por 
+            <a href="https://github.com/" target="_blank" rel="noopener noreferrer">José Hakkenen</a>
+        </footer>
     </main>
 
-    <footer>
-    © <span id="ano"></span> Desenvolvido por 
-    <a href="https://github.com/Hakkenen" target="_blank" rel="noopener noreferrer">José Hakkenen</a>
-</footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Script Principal -->
     <script src="script.js"></script>
 </body>
 </html>
