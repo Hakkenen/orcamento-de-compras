@@ -1,49 +1,41 @@
-const CACHE_NAME = 'orcamento-compras-v1';
+const CACHE_NAME = 'carrinho-v2';
 
-// Arquivos que serão salvos em cache para uso offline
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+const ASSETS = [
+    './',
+    './index.html',
+    './style.css',
+    './script.js',
+    './manifest.json'
 ];
 
-// Instalação do Service Worker e gravação do cache
+// Instala o novo Service Worker e força a ativação imediata
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
-  self.skipWaiting();
+    self.skipWaiting(); 
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    );
 });
 
-// Ativação e limpeza de caches antigos se houver atualização
+// Remove os caches antigos (como o carrinho-v1) e assume o controle da página
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
 });
 
-// Interceptação das requisições de rede (busca primeiro no Cache, depois na Rede)
+// Intercepta requisições: serve do cache se offline, ou busca na rede
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    })
-  );
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+        })
+    );
 });

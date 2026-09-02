@@ -50,26 +50,20 @@
             </form>
         </section>
 
-        <!-- Ações do Carrinho -->
+        <!-- Ações Secundárias -->
         <section class="acoes-container">
             <button id="adicionar-cesta" class="botao-secundario">📦 Cesta Básica (40 itens)</button>
-            <button id="limpar-carrinho" class="botao-danger">🗑️ Limpar Carrinho</button>
         </section>
 
-        <!-- Lista de Produtos e Total -->
+        <!-- Lista de Produtos -->
         <section class="card itens-container">
             <div class="cabecalho-lista">
                 <h2>Itens no Carrinho</h2>
-                <div class="total-box">
-                    <span>Total: R$ <strong id="total-compra">0.00</strong></span>
-                </div>
             </div>
 
             <div id="lista-produtos">
                 <!-- Itens renderizados via JavaScript -->
             </div>
-
-            <button id="gerar-pdf" class="botao-pdf">📄 Gerar PDF do Orçamento</button>
         </section>
 
         <!-- Modal do Leitor de Código de Barras -->
@@ -110,9 +104,23 @@
         <!-- Rodapé -->
         <footer>
             © <span id="ano"></span> Desenvolvido por 
-            <a href="https://github.com/" target="_blank" rel="noopener noreferrer">José Hakkenen</a>
+            <a href="https://github.com/josehakkenen" target="_blank" rel="noopener noreferrer">José Hakkenen</a>
         </footer>
     </main>
+
+    <!-- Barra Inferior Persistente (Fixed Bottom Bar) -->
+    <div class="barra-fixa-bottom">
+        <div class="conteudo-barra">
+            <div class="info-total">
+                <span>Total:</span>
+                <strong>R$ <span id="total-compra">0.00</span></strong>
+            </div>
+            <div class="botoes-barra">
+                <button id="gerar-pdf" class="botao-pdf-fixo" title="Gerar PDF">📄 Gerar PDF</button>
+                <button id="limpar-carrinho" class="botao-limpar-fixo" title="Limpar Carrinho">🗑️ Limpar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Script Principal -->
     <script src="script.js"></script>

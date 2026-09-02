@@ -1,3 +1,21 @@
+// Registra o Service Worker e força atualização automática
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((registration) => {
+            // Verifica se há uma atualização no sw.js
+            registration.onupdatefound = () => {
+                const installingWorker = registration.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Recarrega a página automaticamente para exibir o código novo
+                        window.location.reload();
+                    }
+                };
+            };
+        });
+    });
+}
+
 // ==========================================================================
 // SERVICE WORKER (Suporte Offline / PWA)
 // ==========================================================================
